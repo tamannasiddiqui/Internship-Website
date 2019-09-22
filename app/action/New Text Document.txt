@@ -1,0 +1,185 @@
+if(isset($_POST['action'])){
+     $errorMSG = '';
+   // NAME
+if (empty($_POST["name"])) {
+    $errorMSG = "Name is required <br>";
+} else {
+    $name = $_POST["name"];
+}
+
+//EMAIL
+if (empty($_POST["email"])) {
+    $errorMSG .= "Email is required <br>";
+} else {
+    $email = $_POST["email"];
+}
+ 
+//PHONE
+if (empty($_POST["phone"])) {
+    $errorMSG .= "Phone is required <br>";
+} else {
+    $phone = $_POST["phone"];
+}
+
+//MESSAGE
+if (empty($_POST["message"])) {
+    $errorMSG .= "Message is required <br>";
+} else {
+    $message = $_POST["message"];
+}
+
+ 
+
+//FILE UPLOAD
+
+$statusMsg = '';
+if (isset($_POST['submit'])){
+    $file =  $_FILES['chooseFile'];
+
+    $file_name = $_FILES['file']['name']; 
+    $file_type = $_FILES['file']['type'];
+    $file_size = $_FILES['file']['size'];
+    $file_tem_loc = $_FILES['file']['tmp_name'];
+    
+    $file_error = $_FILES['file']['error'];
+
+    $file_ext = explode('.',$file_name);
+    $file_actual_ext = strtolower(end($file_ext));
+
+    $allowed = array('jpg','png','jpeg','gif','pdf');
+    if(in_array($file_actual_ext, $allowed)){
+        if($file_error===0){
+           if($file_size<1000000){
+              $file_name_new = uniqid('',true).".".$file_actual_ext;
+              $file_store = 'uploads/'.$file_name_new;
+              move_uploaded_file($file_tem_loc,$file_store);
+              header("Location: ./../..career.php?uploadsuccess");
+
+           }
+           else{
+            $statusMsg = "your file is too big";
+           }
+        }
+        else{
+            $statusMsg = "there was an errr uploading your file";
+        }
+    }
+    else {
+        $statusMsg = "you cannot upload files of this type";
+    }
+
+
+    if($statusMsg!=''){
+        echo "no data".$statusMsg;
+    }
+    
+    else{
+        echo "data";
+    
+        $sql = "INSERT INTO career_form (name, email, phone, message,filename, uploaded_on)   VALUES ('$name', '$email', '$phone','$message','$file_name_new', 'NOW()'');
+    
+        $result = $db->_query($sql);
+    
+        if($result){
+                $statusMsg = "The file has been uploaded successfully.";
+        }
+        else{
+            $statusMsg = "File upload failed, please try again.";
+        } 
+    }
+  
+// $statusMsg = '';
+
+// // File upload path
+// $targetDir = "uploads/";
+// $fileName = basename($_FILES["file"]["name"]);
+// $targetFilePath = $targetDir . $fileName;
+// $fileType = pathinfo($targetFilePath,PATHINFO_EXTENSION);
+
+// if(isset($_POST["submit"]) && !empty($_FILES["file"]["name"])){
+//     // Allow certain file formats
+//     $allowTypes = array('jpg','png','jpeg','gif','pdf');
+//     if(in_array($fileType, $allowTypes)){
+//         // Upload file to server
+//         if(move_uploaded_file($_FILES["file"]["tmp_name"], $targetFilePath)){
+//             // Insert image file name into database
+//             $insert = $db->query("INSERT into career_form(file_name, uploaded_on) VALUES ('".$fileName."', NOW())");
+//             if($insert){
+//                 $statusMsg = "The file ".$fileName. " has been uploaded successfully.";
+//             }else{
+//                 $statusMsg = "File upload failed, please try again.";
+//             } 
+//         }else{
+//             $statusMsg = "Sorry, there was an error uploading your file.";
+//         }
+//     }else{
+//         $statusMsg = 'Sorry, only JPG, JPEG, PNG, GIF, & PDF files are allowed to upload.';
+//     }
+// }else{
+//     $statusMsg = 'Please select a file to upload.';
+// }
+
+// // Display status message
+// echo $statusMsg;
+
+  
+// if($errorMSG!=''){
+//     echo "no data".$errorMSG;
+// }
+
+// else{
+//     echo "data";
+
+//     $sql = "INSERT INTO career_form (name, email, phone, organisation, message)   VALUES ('$name', '$email', '$phone', '$organisation' ,'$message')";
+
+//     $result = $db->_query($sql);
+
+//     print_r($result);
+// }
+
+
+
+
+
+
+if ($_SERVER['REQUEST_METHOD']=='POST')
+ {
+     $name = $mysqli->real_escape_string($_POST['name']);
+     $email = $mysqli->real_escape_string($_POST['email']);
+     $phone = $mysqli->real_escape_string($_POST['phone']);
+     $message = $mysqli->real_escape_string($_POST['message']);
+     $filepath = $mysqli->real_escape_string('../../uploads/'.$_FILES ['chooseFile']['name']));
+     
+     $allowed = array('jpg','png','jpeg','gif','pdf');
+     if(preg_match("!allowed!",$_FILES['chooseFile']['type']))
+     {
+         if(copy($_FILES['chooseFile']['tmp_name'],$filepath))
+         {
+            $_SESSION['name']=$name;
+            $_SESSION['chooseFile']=$filepath;
+
+            $sql = "INSERT INTO career_form(name, email, phone, message,chooseFile) "
+                    ."VALUES ('$name'.'$email','$phone','$message','$filepath');
+
+            
+             if(mysqli->query($sql)=== true){
+                 $_SESSION['message'] = "Rgisteration successful";
+                 header("location: career.php");
+             } else{
+                 $_SESSION['message']="User couldnot be added to the database";
+             }           
+
+         }
+     }
+
+ 
+    }
+
+ 
+?>
+
+
+
+
+
+ 
